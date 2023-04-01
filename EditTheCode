@@ -1,0 +1,84 @@
+// get the table element and add a click event listener to it
+const userDataTable = document.getElementById("userDataTable");
+userDataTable.addEventListener("click", function(event) {
+  // check if the clicked element is an edit button
+  if (event.target.classList.contains("editBtn")) {
+    // get the ID of the user to be edited
+    const userId = event.target.dataset.id;
+
+    // retrieve the existing user data from local storage
+    const userData = JSON.parse(localStorage.getItem("userData"));
+
+    // find the user with the matching ID
+    const user = userData.find(function(user) {
+      return user.id === userId;
+    });
+
+    // display a form with the current data pre-filled
+    const nameInput = document.getElementById("name");
+    const emailInput = document.getElementById("email");
+    const phoneInput = document.getElementById("phone");
+    nameInput.value = user.name;
+    emailInput.value = user.email;
+    phoneInput.value = user.phone;
+
+    // remove the existing row from the UI
+    event.target.parentElement.parentElement.remove();
+
+    // change the save button to an update button
+    const saveBtn = document.getElementById("saveBtn");
+    saveBtn.innerHTML = "Update";
+    saveBtn.dataset.id = userId;
+  }
+});
+
+// get the save button element
+const saveBtn = document.getElementById("saveBtn");
+
+// add a click event listener to the save button
+saveBtn.addEventListener("click", function() {
+  const userId = saveBtn.dataset.id;
+
+  if (userId) {
+    // if the save button has a user ID, update the existing user data
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const phone = document.getElementById("phone").value;
+
+    // retrieve the existing user data from local storage
+    let userData = JSON.parse(localStorage.getItem("userData"));
+
+    // find the user with the matching ID and update the data
+    userData = userData.map(function(user) {
+      if (user.id === userId) {
+        user.name = name;
+        user.email = email;
+        user.phone = phone;
+      }
+      return user;
+    });
+
+    // store the updated user data in local storage
+    localStorage.setItem("userData", JSON.stringify(userData));
+
+    // add the updated row to the UI
+    const newRow = userDataTable.insertRow();
+    newRow.innerHTML = `
+      <td>${name}</td>
+      <td>${email}</td>
+      <td>${phone}</td>
+      <td><button class="editBtn" data-id="${userId}">Edit</button> <button class="deleteBtn" data-id="${userId}">Delete</button></td>
+    `;
+
+    // reset the form and the save button
+    document.getElementById("userForm").reset();
+    saveBtn.innerHTML = "Save";
+    saveBtn.removeAttribute("data-id");
+  } else {
+    // if the save button does not have a user ID, add a new user
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const phone = document.getElementById("phone").value;
+
+    // retrieve the existing user data from local storage
+   
